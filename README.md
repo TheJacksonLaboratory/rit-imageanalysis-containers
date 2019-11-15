@@ -8,7 +8,7 @@ Singularity image (ubuntu_with_fiji.sif) needs to be built from existing recipe.
 # Instructions
 Just run spin_fiji.sh on your cluster of choice. Usage:
 
-```shell
+```text
 spin_fiji.sh [-h] [-t time -c cores -m memory --fiji-args "arguments"]
 
 where:
