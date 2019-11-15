@@ -1,0 +1,24 @@
+BootStrap: debootstrap
+OSVersion: trusty
+MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+
+
+%runscript
+	ImageJ-linux64 "$@"
+
+%post
+    sed -i 's/$/ universe/' /etc/apt/sources.list
+    apt-get update
+    apt-get -y install wget unzip xvfb libxrender1 libxtst6 libxi6
+    apt-get clean
+    wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
+	unzip fiji-linux64.zip -d /usr/bin
+	rm fiji-linux64.zip
+	export PATH=/usr/bin/Fiji.app:$PATH 
+	echo "export PATH=/usr/bin/Fiji.app:$PATH" >> "$SINGULARITY_ENVIRONMENT"
+	cd /usr/local/bin
+	echo 'print("Hello World!");' > helloWorld.ijm
+
+%test
+	export PATH=/usr/bin/Fiji.app:$PATH
+	ImageJ-linux64 --headless --run /usr/local/bin/helloWorld.ijm
