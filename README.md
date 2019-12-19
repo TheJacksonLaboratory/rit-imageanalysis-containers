@@ -25,6 +25,7 @@ We have two scripts: `open_fiji.sh` and `spin_fiji.sh`. You shouldn't need to ed
 ```
 
 Fiji can take a lot of command-line arguments; a comprehensive list is can be obtained by running any Fiji executable you might have with `ImageJ-XXXXXX --help`. A very outdated list of possible arguments is also found at https://imagej.nih.gov/ij/docs/guide/146-18.html , but I wouldn't trust it. 
+
 A useful thing you can do with command-line arguments is telling Fiji which folder to use for finding plugins, jar files and macros. Since your home folder is mapped into the Singularity container, you can have your personalised Fiji folder in your home directory with all your favourite plugins and just point the container version to that. 
 
 Known issues
