@@ -16,6 +16,8 @@ You should now have a `ubuntu_with_fiji.sif` file in your directory.
 
 Using the container on sumner
 ========================
+If you just want to run Fiji: `./spin_fiji.sh`. As long as your built container is in the same directory, you're good to go. It will run as a job on a single core, with 4GB RAM for 10 minutes.
+
 We have two scripts: `open_fiji.sh` and `spin_fiji.sh`. You shouldn't need to edit `open_fiji.sh` for any reason: it's what is passed to a SLURM `srun` call and it just loads the Singularity module and runs the container we built with any arguments you pass. `spin_fiji.sh` is the script you will run. It has a few useful options that you can find by running `spin_fiji.sh`. A summary follows:
 ```
 -t  How long the job will run for (default: 10 minutes)
