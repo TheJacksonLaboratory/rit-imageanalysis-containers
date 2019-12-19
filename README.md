@@ -10,6 +10,7 @@ Recipe provided - we're using the directory /home/user in the container for inst
 
 To build it, run  
 `singularity run http://s3-far.jax.org/builder/builder ubuntu_with_fiji.rec ubuntu_with_fiji.sif` 
+
 You should now have a `ubuntu_with_fiji.sif` file in your directory.
 
 (reminder: if you want to change anything on the recipe and rebuild the container, you will need to delete your local copy! The remote builder does not overwrite by default.)
