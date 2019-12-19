@@ -11,9 +11,17 @@ Recipe provided - we're using the directory /home/user in the container for inst
 To build it, run  
 `singularity run http://s3-far.jax.org/builder/builder ubuntu_with_fiji.rec ubuntu_with_fiji.sif` 
 
+Alternatively, you can use our `build_fiji_container.sh` script to build it. You just need to run it using something like 
+
+```
+srun -n 1 -t 00-10:00 -q batch build_fiji_container.sh
+```
+
+Note that the login nodes do not have Singularity enabled, so you need to request a compute node!
+
 You should now have a `ubuntu_with_fiji.sif` file in your directory.
 
-(reminder: if you want to change anything on the recipe and rebuild the container, you will need to delete your local copy! The remote builder does not overwrite by default.)
+(reminder: if you want to change anything on the recipe and rebuild the container, you will need to delete your local copy! The remote builder does not overwrite by default. Using our script to build it gets rid of this issue.)
 
 Using the container on sumner
 ========================
