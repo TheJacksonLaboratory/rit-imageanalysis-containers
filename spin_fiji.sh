@@ -13,11 +13,12 @@ where:
     Fiji can take a lot of command-line arguments; a comprehensive list is can be obtained by running any Fiji executable you might have with ImageJ-XXXXXX --help"
 
 
+##Default options in case user doesn't pass any arguments
+time="00-10:00"
+cores="1"
+memory="4000"
 
-time = "00-10:00"
-cores = "1"
-memory = "4000"
-
+##Parse arguments
 while [ "$#" -gt 0 ]; do
   case "$1" in
     -t|--time) time="$2"; shift 2;;
@@ -26,17 +27,18 @@ while [ "$#" -gt 0 ]; do
 
     --fiji-args) arguments="$2"; shift 2;;
     --time|--memory|--cores|fiji-args) echo "$1 requires an argument" >&2; exit 1;;
-
+    -h) echo "$usage"; exit 0;;
     -*) echo "unknown option: $1" >&2; exit 1;;
     *) handle_argument "$1"; shift 1;;
   esac
 done
 
-
+## These are arguments that will be passed to Fiji; same amount of memory as allocated,
+## plus any Fiji-specific arguments
 arguments="--mem=$memory $arguments"
 
-
-command="srun -n $cores -t $time --mem=$memory --pty --x11 open_fiji.sh $arguments"
+## Build and run an srun command on batch queue
+command="srun -n $cores -t $time --mem=$memory -q batch --pty --x11 open_fiji.sh $arguments"
 echo $command
 
 $command
