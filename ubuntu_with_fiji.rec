@@ -19,6 +19,7 @@ From:ubuntu:latest
 	echo "export PATH=$MYHOME/Fiji.app:$PATH" >> "$SINGULARITY_ENVIRONMENT"
 	cd $MYHOME
 	echo 'print("Hello World!");' > helloWorld.ijm
+	$MYHOME/Fiji.app/ImageJ-linux64 --update update
 
 %test
 	export MYHOME=/home/user
