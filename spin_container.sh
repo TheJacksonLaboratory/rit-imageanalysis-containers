@@ -35,7 +35,7 @@ done
 
 
 ## Build and run an srun command on batch queue
-command="srun -n $cores -t $time --mem=$memory -q batch --pty --x11 $@"
+command="srun -n $cores -t $time --mem=$memory -q batch --pty --x11 open_container.sh $@"
 echo $command
 
 $command
