@@ -27,7 +27,7 @@ while [ "$#" -gt 0 ]; do
     --time|--memory|--cores) echo "$1 requires an argument" >&2; exit 1;;
     -h) echo "$usage"; exit 0;;
     -*) echo "unknown option: $1" >&2; exit 1;;
-    *) handle_argument "$1"; shift 1;;
+    *) shift 1;;
   esac
 done
 
