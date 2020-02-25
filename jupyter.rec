@@ -1,0 +1,12 @@
+Bootstrap: docker
+From: debian:buster-slim
+
+
+%runscript
+    PORT=$(shuf -n 1 -i 49152-65535)
+	jupyter notebook --no-browser --port=$PORT --ip=`hostname -i`
+
+%post
+    apt-get update
+    apt-get install -y python3 python3-pip libsm6 libxext6 libxrender-dev
+    pip3 install scikit-image opencv-python jupyter pandas matplotlib scikit-learn

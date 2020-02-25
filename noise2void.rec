@@ -1,0 +1,12 @@
+Bootstrap: docker
+From: debian:buster-slim
+
+
+%runscript
+	python3
+
+
+%post
+    apt-get update
+    apt-get install -y python3 python3-pip 
+    pip3 install tensorflow-gpu==1.14 keras==2.2.4 jupyter n2v

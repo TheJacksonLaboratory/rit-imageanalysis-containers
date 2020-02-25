@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: ubuntu:16.04
+
+%runscript
+	export MYHOME=/home/user
+	cd $MYHOME/ilastik-1.*-Linux
+    ./run_ilastik.sh
+
+%post
+    export MYHOME=/home/user
+    mkdir $MYHOME
+    cd $MYHOME
+    apt-get update
+    apt-get install -y wget bzip2 libglu1-mesa-dev qt5-default libgl1-mesa-glx
+    wget https://files.ilastik.org/ilastik-1.3.3post2-Linux.tar.bz2
+    tar xjf ilastik-1.*-Linux.tar.bz2
+    rm ilastik-1.*-Linux.tar.bz2
+    cd $MYH

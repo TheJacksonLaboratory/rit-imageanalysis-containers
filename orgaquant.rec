@@ -1,0 +1,28 @@
+Bootstrap: docker
+From: debian:buster-slim
+
+
+%runscript
+    cd /home/user/OrgaQuant
+	streamlit run orgaquant.py
+    
+
+%post
+    apt-get update
+    apt-get install -y python3 python3-pip git wget libsm6 libxext6 libxrender-dev
+    pip3 install \
+    tensorflow-gpu==1.14 \
+    keras-resnet==0.2.0 \
+    cython \
+    keras \
+    matplotlib \
+    opencv-python \
+    progressbar2 \
+    streamlit
+    mkdir /home/user
+    cd /home/user
+    git clone https://github.com/TKassis/OrgaQuant.git
+    cd OrgaQuant
+    python3 setup.py build_ext --inplace
+    cd trained_models
+    wget https://github.com/TKassis/OrgaQuant/releases/download/v0.1/orgaquant_intestinal_v2.h5

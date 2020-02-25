@@ -1,0 +1,11 @@
+Bootstrap: docker
+From: debian:buster-slim
+
+
+%runscript
+	python3
+
+%post
+    apt-get update
+    apt-get install -y python3 python3-pip libsm6 libxext6 libxrender-dev
+    pip3 install scikit-image opencv-python

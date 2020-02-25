@@ -1,0 +1,17 @@
+Bootstrap: docker
+From: ubuntu:xenial
+
+
+%runscript
+    cd /qupath/QuPath
+	./QuPath
+
+
+%post
+    mkdir /qupath
+    cd /qupath
+    apt-get update
+    apt-get install -y wget default-jre
+    wget https://github.com/qupath/qupath/releases/download/v0.1.2/QuPath-0.1.2.tar.gz
+    tar xvvf QuPath-0.1.2.tar.gz
+    rm QuPath-0.1.2.tar.gz

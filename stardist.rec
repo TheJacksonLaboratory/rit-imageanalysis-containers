@@ -1,0 +1,42 @@
+Bootstrap:docker
+From:debian:buster-slim
+
+
+%runscript
+	export MYHOME=/home/user
+	$MYHOME/Fiji.app/ImageJ-linux64 "$@"
+
+%setup
+    mkdir ${SINGULARITY_ROOTFS}/home/user
+
+%files
+    stardist_script.py /home/user
+
+%post
+    export MYHOME=/home/user
+    #mkdir $MYHOME
+    apt-get update
+    apt-get -y install wget unzip xvfb libxrender1 libxtst6 libxi6
+    apt-get clean
+    wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
+	unzip fiji-linux64.zip -d $MYHOME
+	rm fiji-linux64.zip
+	export PATH=$MYHOME/Fiji.app:$PATH 
+	echo "export PATH=$MYHOME/Fiji.app:$PATH" >> "$SINGULARITY_ENVIRONMENT"
+	cd $MYHOME
+	echo 'print("Hello World!");' > helloWorld.ijm
+    mkdir $MYHOME/Fiji.app/models
+    wget https://data.broadinstitute.org/bbbc/BBBC001/BBBC001_v1_images_tif.zip
+    unzip BBBC001_v1_images_tif.zip
+    rm BBBC001_v1_images_tif.zip
+    mv human_ht29_colon_cancer_1_images images    
+    chmod 777 images
+    $MYHOME/Fiji.app/ImageJ-linux64 --update add-update-site CSBDeep https://sites.imagej.net/CSBDeep/
+    $MYHOME/Fiji.app/ImageJ-linux64 --update add-update-site StarDist https://sites.imagej.net/StarDist/
+	$MYHOME/Fiji.app/ImageJ-linux64 --update update
+
+
+%test
+	export MYHOME=/home/user
+	export PATH=$MYHOME/Fiji.app:$PATH
+	$MYHOME/Fiji.app/ImageJ-linux64 --headless --ij2 --console --run $MYHOME/stardist_script.py

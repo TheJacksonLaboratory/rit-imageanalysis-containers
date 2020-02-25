@@ -1,0 +1,23 @@
+Bootstrap: docker
+From: debian:buster-slim
+
+
+%runscript
+    cd /home/
+    PORT=$(shuf -n 1 -i 49152-65535)
+	jupyter notebook --no-browser --port=$PORT --ip=`hostname -i`
+
+%post
+    mkdir /home/user
+    cd /home/user
+    apt-get update
+    apt-get install -y git wget python3 python3-pip
+    git clone https://github.com/TheJacksonLaboratory/images-as-signals.git
+    pip3 install jupyter==1.0.0 \
+        jupyter_client==5.3.4 \
+        jupyter_console==6.0.0 \
+        jupyter_core==4.6.0 \
+        nbconvert==5.6.0 \
+        nbformat==4.4.0 \
+        pandas \
+        scikit-image==0.16.1
