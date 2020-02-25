@@ -27,14 +27,14 @@ while [ "$#" -gt 0 ]; do
     --time|--memory|--cores) echo "$1 requires an argument" >&2; exit 1;;
     -h) echo "$usage"; exit 0;;
     -*) echo "unknown option: $1" >&2; exit 1;;
-    *) shift 1;;
+    *) argument = "$argument"+"$2";;shift 1;;
   esac
 done
 
 
 
 ## Build and run an srun command on batch queue
-command="srun -n $cores -t $time --mem=$memory -q batch --pty --x11 $1"
+command="srun -n $cores -t $time --mem=$memory -q batch --pty --x11 $argument"
 echo $command
 
 $command
