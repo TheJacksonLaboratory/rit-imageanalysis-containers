@@ -9,7 +9,7 @@ where:
     -c  How many cores your job will use (default: 1)
     -m  How much memory will be allocated for your job (default: 4GB)
     
-
+"
 
 ##Default options in case user doesn't pass any arguments
 time="00-10:00"
