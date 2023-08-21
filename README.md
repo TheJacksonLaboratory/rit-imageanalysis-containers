@@ -6,10 +6,33 @@ Building the container
 ========================
 Recipes are provided - for many of the containers, we're using the directory /home/user for installation. We don't want any ambiguity between what's container stuff and what's your home directory.
 
-To build it on sumner, run  
-`singularity run http://s3-far.jax.org/builder/builder <RECIPEFILE> <CONTAINERFILE>` 
+The easiest way to build containers from the recipes in this repository is to use the Sylabs cloud builder.  
+To do this, you will need to set up an account at https://cloud.sylabs.io/builder  
+Once you have an account and are logged in—ideally in a new tab or window—click on the Remote Builder tab at the top.  
+Then, in the page that opens, you can copy-paste a recipe from this repository into the definition code editor at the top. First delete the example and then click on one of the .rec files in this repository browser window, select all of the lines of code, and copy-paste to the empty definition code editor in the Remote Builder pane. At this point, you can also make edits to create a customized container.    
+Next, below the code editor, give your container a name, for example for the `qupath_latest.rec` one may use: `imageanalysis/qupath:0.4.3`  
+Finally, click `Submit Build` and wait for the build to finish successfully—this can take a few minutes!
 
-Alternatively, you can use our `build_container.sh` script to build it. On sumner, ou just need to run it using something like 
+To pull your container and use it, for example on Sumner HPC at JAX, you will need to use `singularity` to connect to the Sylabs cloud, which should be available by default, by using `singularity remote login`. You will be asked to set up an access token at https://cloud.sylabs.io/auth/tokens  
+At the top, enter a name for the token—it can be anything, such as `HPC` or `sumner`—and then click `Create Access Token`. The token will be a long string of random characters, so it's best to click the grey button on the right to copy it and then paste it into your terminal window asking for the API key. Once this is completed, you can use `singularity remote list` to ensure that `SylabsCloud` is listed and marked as Active. If it is not, use `singularity remote use SylabsCloud`  
+Finally, to pull the example QuPath container from above, use:  
+```
+singularity pull qupath_0_4_3.sif library://<your Sylabs username>/imageanalysis/qupath:0.4.3
+```  
+For other containers, subsitute the `.sif` file name and the `collection/container-name:tag` as needed—you can copy-paste from the builds listed under My Builds on the Remote Builder tab.
+
+Alternately, if you've cloned this repository or downloaded the .rec files, after setting up the remote builder as described above, you can build and pull the container in one step, for example:  
+```
+singularity build --remote qupath_0_4_3.sif qupath_latest.rec
+```
+
+Finally, if you're at JAX, you can use the JAX remote builder to build your container on sumner, as follows:  
+```
+singularity run http://s3-far.jax.org/builder/builder <RECIPEFILE> <CONTAINERFILE>
+``` 
+Note: this is currently deprecated in favor of the Sylabs cloud builder.
+
+Alternatively, you can use our `build_container.sh` script to build it. On sumner, you just need to run it using something like 
 
 ```
 srun -n 1 -t 00-10:00 -q batch build_container.sh <RECIPEFILE> <CONTAINERFILE>
@@ -19,7 +42,8 @@ Note that the login nodes do not have Singularity enabled, so you need to reques
 
 You should now have a container file in your directory.
 
-(reminder: if you want to change anything on the recipe and rebuild the container, you will need to delete your local copy! The remote builder does not overwrite by default. Using our script to build it gets rid of this issue.)
+> **Warning** 
+> If you want to change anything in the recipe and rebuild the container, you will need to delete your local .sif file! The remote builder does not overwrite by default. Using our script to build it gets rid of this issue.
 
 Using the container on sumner
 ========================
