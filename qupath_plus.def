@@ -1,0 +1,54 @@
+Bootstrap: docker
+From: amd64/ubuntu:jammy
+
+%runscript
+    cd /qupath/QuPath/bin
+    ./QuPath
+
+%post
+# install needed dependencies
+    rm -rf /var/lib/apt/lists/*
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         ca-certificates \
+         wget \
+         libgl1 \
+         xz-utils \
+         openjfx \
+         unzip
+    
+# get QuPath 0.4.3
+    mkdir /qupath
+    chmod 777 qupath
+    cd /qupath
+    wget https://github.com/qupath/qupath/releases/download/v0.4.3/QuPath-0.4.3-Linux.tar.xz
+    tar -xvf QuPath-0.4.3-Linux.tar.xz
+    rm /qupath/QuPath-0.4.3-Linux.tar.xz
+
+# set permissions to make it executable
+    chmod a+x /qupath/QuPath/bin/QuPath
+
+# install extensions for 0.4.x
+    cd /qupath/QuPath/lib/app/
+    wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.2.0/qupath-extension-djl-0.2.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.2.0.jar' QuPath.cfg
+
+    wget https://github.com/qupath/qupath-extension-stardist/releases/download/v0.4.0/qupath-extension-stardist-0.4.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-stardist-0.4.0.jar' QuPath.cfg
+
+    wget https://github.com/qupath/qupath-extension-bioimageio/releases/download/v0.1.0/qupath-extension-bioimageio-0.1.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-bioimageio-0.1.0.jar' QuPath.cfg
+
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.5.0/qupath-extension-biop-omero-0.5.0.zip
+    unzip qupath-extension-biop-omero-0.5.0.zip
+    rm qupath-extension-biop-omero-0.5.0.zip
+    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.8/OMERO.java-5.6.8-ice36.zip
+    unzip OMERO.java-5.6.8-ice36.zip
+    mv OMERO.java-5.6.8-ice36/libs .
+    rm OMERO.java-5.6.8-ice36.zip
+    rm -d OMERO.java-5.6.8-ice36
+    # need to remove the extra (older) jar which causes conflicts
+    rm libs/slf4j-api.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.5.0.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.14.0.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
