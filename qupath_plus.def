@@ -2,7 +2,7 @@ Bootstrap: docker
 From: amd64/ubuntu:jammy
 
 %runscript
-    cd /qupath/QuPath/bin
+    cd QuPath/bin
     ./QuPath
 
 %post
@@ -22,12 +22,14 @@ From: amd64/ubuntu:jammy
     LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep location | awk -F/ '{print $NF'} | tr -d '\r')
     wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION}-Linux.tar.xz
     tar xvf QuPath-${LATEST_VERSION}-Linux.tar.xz
+    mv QuPath-${LATEST_VERSION}-Linux/QuPath .
     rm QuPath-${LATEST_VERSION}-Linux.tar.xz
+    rm -r QuPath-${LATEST_VERSION}-Linux
 # set permissions to make it executable
-    chmod a+x /qupath/QuPath/bin/QuPath
+    chmod a+x QuPath/bin/QuPath
 
 # install extensions for 0.5.x
-    cd /qupath/QuPath/lib/app/
+    cd QuPath/lib/app/
     wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.3.0/qupath-extension-djl-0.3.0.jar
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.3.0.jar' QuPath.cfg
 
