@@ -2,7 +2,7 @@ Bootstrap: docker
 From: amd64/ubuntu:jammy
 
 %runscript
-    cd QuPath/bin
+    cd /QuPath/bin
     ./QuPath
 
 %post
