@@ -42,13 +42,13 @@ From: amd64/ubuntu:jammy
     wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.8.1/qupath-extension-biop-omero-0.8.1.zip
     unzip qupath-extension-biop-omero-0.8.1.zip
     rm qupath-extension-biop-omero-0.8.1.zip
-    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.8/OMERO.java-5.6.8-ice36.zip
-    unzip OMERO.java-5.6.8-ice36.zip
-    mv OMERO.java-5.6.8-ice36/libs .
-    rm OMERO.java-5.6.8-ice36.zip
-    rm -d OMERO.java-5.6.8-ice36
-    # need to remove the extra (older) jar which causes conflicts
-    rm libs/slf4j-api.jar
+    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.10/OMERO.java-5.6.10-ice36.zip
+    unzip OMERO.java-5.6.10-ice36.zip
+    mv OMERO.java-5.6.10-ice36/libs .
+    rm OMERO.java-5.6.10-ice36.zip
+    rm -d OMERO.java-5.6.10-ice36
+    
+    # update classpaths so the omero extension uses the app path
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.8.1.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.16.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
