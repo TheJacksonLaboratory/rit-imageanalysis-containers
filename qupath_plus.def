@@ -19,7 +19,7 @@ From: amd64/ubuntu:jammy
          curl
     
 # get latest version URL from latest release on GitHub
-    LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep Location | awk -F/ '{print $NF'} | tr -d '\r')
+    LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep location | awk -F/ '{print $NF'} | tr -d '\r')
     wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION#v}-Linux.tar.xz
     tar xvf QuPath-${LATEST_VERSION#v}-Linux.tar.xz
     rm QuPath-${LATEST_VERSION#v}-Linux.tar.xz
