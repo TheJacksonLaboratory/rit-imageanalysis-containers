@@ -17,31 +17,28 @@ From: amd64/ubuntu:jammy
          openjfx \
          unzip
     
-# get QuPath 0.4.3
-    mkdir /qupath
-    chmod 777 qupath
-    cd /qupath
-    wget https://github.com/qupath/qupath/releases/download/v0.4.3/QuPath-0.4.3-Linux.tar.xz
-    tar -xvf QuPath-0.4.3-Linux.tar.xz
-    rm /qupath/QuPath-0.4.3-Linux.tar.xz
-
+# get latest version URL from latest release on GitHub
+    LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep Location | awk -F/ '{print $NF'} | tr -d '\r')
+    wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION#v}-Linux.tar.xz
+    tar xvf QuPath-${LATEST_VERSION#v}-Linux.tar.xz
+    rm QuPath-${LATEST_VERSION#v}-Linux.tar.xz
 # set permissions to make it executable
     chmod a+x /qupath/QuPath/bin/QuPath
 
-# install extensions for 0.4.x
+# install extensions for 0.5.x
     cd /qupath/QuPath/lib/app/
-    wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.2.0/qupath-extension-djl-0.2.0.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.2.0.jar' QuPath.cfg
+    wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.3.0/qupath-extension-djl-0.3.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.3.0.jar' QuPath.cfg
 
-    wget https://github.com/qupath/qupath-extension-stardist/releases/download/v0.4.0/qupath-extension-stardist-0.4.0.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-stardist-0.4.0.jar' QuPath.cfg
+    wget https://github.com/qupath/qupath-extension-stardist/releases/download/v0.5.0/qupath-extension-stardist-0.5.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-stardist-0.5.0.jar' QuPath.cfg
 
     wget https://github.com/qupath/qupath-extension-bioimageio/releases/download/v0.1.0/qupath-extension-bioimageio-0.1.0.jar
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-bioimageio-0.1.0.jar' QuPath.cfg
 
-    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.5.0/qupath-extension-biop-omero-0.5.0.zip
-    unzip qupath-extension-biop-omero-0.5.0.zip
-    rm qupath-extension-biop-omero-0.5.0.zip
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.8.1/qupath-extension-biop-omero-0.8.1.zip
+    unzip qupath-extension-biop-omero-0.8.1.zip
+    rm qupath-extension-biop-omero-0.8.1.zip
     wget https://github.com/ome/openmicroscopy/releases/download/v5.6.8/OMERO.java-5.6.8-ice36.zip
     unzip OMERO.java-5.6.8-ice36.zip
     mv OMERO.java-5.6.8-ice36/libs .
@@ -49,6 +46,6 @@ From: amd64/ubuntu:jammy
     rm -d OMERO.java-5.6.8-ice36
     # need to remove the extra (older) jar which causes conflicts
     rm libs/slf4j-api.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.5.0.jar' QuPath.cfg
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.14.0.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.8.1.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.16.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
