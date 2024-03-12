@@ -1,0 +1,29 @@
+Bootstrap: docker
+From: amd64/ubuntu:jammy
+
+%runscript
+    cd /QuPath/bin
+    ./QuPath
+
+%post
+# install needed dependencies
+    rm -rf /var/lib/apt/lists/*
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         ca-certificates \
+         wget \
+         libgl1 \
+         xz-utils \
+         openjfx \
+         unzip \
+         curl
+
+# get latest version URL from latest release on GitHub
+    LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep location | awk -F/ '{print $NF'} | tr -d '\r')
+    wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION}-Linux.tar.xz
+    tar xvf QuPath-${LATEST_VERSION}-Linux.tar.xz
+    mv QuPath-${LATEST_VERSION}-Linux/QuPath .
+    rm QuPath-${LATEST_VERSION}-Linux.tar.xz
+    rm -r QuPath-${LATEST_VERSION}-Linux
+# set permissions to make it executable
+    chmod a+x QuPath/bin/QuPath
