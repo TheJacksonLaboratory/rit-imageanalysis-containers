@@ -10,7 +10,7 @@ From:ubuntu:latest
     export MYHOME=/home/user
     mkdir $MYHOME
     apt-get update
-    apt-get -y install wget unzip xvfb libxrender1 libxtst6 libxi6
+    apt-get -y install wget unzip xvfb libxrender1 libxtst6 libxi6 fontconfig
     apt-get clean
     wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
 	unzip fiji-linux64.zip -d $MYHOME
