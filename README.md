@@ -13,7 +13,7 @@ sinteractive -p build -q build
 ```
 
 For more details regarding accessing and using this JAX-specific resource, please see [the instructions in SharePoint](https://jacksonlaboratory.sharepoint.com/sites/ResearchIT/SitePages/JAX-HPC-Pro-Tip.aspx) .
-Once you're using the build partition, pick a definition file, click on it, and download it or copy-paste the contents to your Sumner2 user-space and then you can build it using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html).
+Once you're using the build partition, pick a definition file, click on it, and download it and then upload or copy-paste the contents to your Sumner2 user-space. Or use `wget` on Sumner2 to download the URL of the definition file (`Raw` button in the top right). Eitherway, once you have the .def file in your Sumner2 user-space and you're using the build partition, you can build it using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html).
 
 
 ## Building the container in the cloud
