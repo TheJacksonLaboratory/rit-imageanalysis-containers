@@ -1,15 +1,16 @@
 What is this?
 ========================
-This is a repository with Singularity recipes that build containers with a number of different image analysis tools and a set of scripts that take care of running a SLURM task that spins up one of those containers. These have been tested on our cluster (sumner) - I cannot guarantee the SLURM part of it will work with your cluster but the containers should work on any Linux system!
+This is a repository with Singularity definitions that build containers with a number of different image analysis tools and a set of scripts that take care of running a SLURM task that spins up one of those containers. These have been tested on our cluster (sumner) - I cannot guarantee the SLURM part of it will work with your cluster but the containers should work on any Linux system!
 
 Building the container
 ========================
-Recipes are provided - for many of the containers, we're using the directory /home/user for installation. We don't want any ambiguity between what's container stuff and what's your home directory.
+Definitions are provided - for many of the containers, we're using the directory /home/user for installation. We don't want any ambiguity between what's container stuff and what's your home directory.
 
-The easiest way to build containers from the recipes in this repository is to use the Sylabs cloud builder.  
+At JAX, the easiest way to build containers from the 
+The easiest way to build containers from the definitions in this repository is to use the Sylabs cloud builder.  
 To do this, you will need to set up an account at https://cloud.sylabs.io/builder  
 Once you have an account and are logged in—ideally in a new tab or window—click on the Remote Builder tab at the top.  
-Then, in the page that opens, you can copy-paste a recipe from this repository into the definition code editor at the top. First delete the example and then click on one of the .rec files in this repository browser window, select all of the lines of code, and copy-paste to the empty definition code editor in the Remote Builder pane. At this point, you can also make edits to create a customized container.    
+Then, in the page that opens, you can copy-paste a definition from this repository into the definition code editor at the top. First delete the example and then click on one of the .rec files in this repository browser window, select all of the lines of code, and copy-paste to the empty definition code editor in the Remote Builder pane. At this point, you can also make edits to create a customized container.    
 Next, below the code editor, give your container a name, for example for the `qupath_latest.rec` one may use: `imageanalysis/qupath:0.4.3`  
 Finally, click `Submit Build` and wait for the build to finish successfully—this can take a few minutes!
 
@@ -43,7 +44,7 @@ Note that the login nodes do not have Singularity enabled, so you need to reques
 You should now have a container file in your directory.
 
 > **Warning** 
-> If you want to change anything in the recipe and rebuild the container, you will need to delete your local .sif file! The remote builder does not overwrite by default. Using our script to build it gets rid of this issue.
+> If you want to change anything in the definition and rebuild the container, you will need to delete your local .sif file! The remote builder does not overwrite by default. Using our script to build it gets rid of this issue.
 
 Using the container on sumner
 ========================
