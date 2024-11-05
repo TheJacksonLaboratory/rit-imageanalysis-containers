@@ -18,7 +18,7 @@ From: amd64/ubuntu:jammy
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
     software-properties-common ca-certificates && \
     wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
-    wget -O "/etc/apt/sources.list.d/xpra.sources" https://xpra.org/repos/jammy/xpra.sources
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/jammy/xpra.sources
 
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
