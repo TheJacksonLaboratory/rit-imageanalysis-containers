@@ -13,6 +13,7 @@ From: amd64/ubuntu:jammy
          openjfx \
          unzip \
          curl
+         uuidgen
 
 # Install latest Xpra and dependencies
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
