@@ -70,12 +70,13 @@ From: amd64/ubuntu:jammy
 #!/bin/bash
     export DISPLAY=:100
     PORT=$(shuf -n 1 -i 9000-12000)
-    KEY=$(uuidgen)
-    echo "AES key is $KEY"
-    echo "Launching napari on Xpra. Connect via http://localhost:$PORT/?encryption=AES&keydata=$KEY \
-    or http://$(hostname -i):$PORT/?encryption=AES&keydata=$KEY"; \
+    XPRA_PASSWORD=$(uuidgen)
+    echo "Password is $XPRA_PASSWORD"
+    echo "Launching napari on Xpra. Connect via \
+    http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"; \
     xpra start \
-    --bind-tcp=0.0.0.0:$PORT,encryption=AES,keydata=$KEY \
+    --bind-tcp=0.0.0.0:$PORT \
+    --tcp-auth=env \
     --html=on \
     --start="/QuPath/bin/QuPath" \
     --exit-with-client="yes" \
