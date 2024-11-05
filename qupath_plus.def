@@ -76,7 +76,6 @@ From: amd64/ubuntu:jammy
     echo "Launching napari on Xpra. Connect via \
     http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"; \
     xpra start \
-    --bind-tcp=0.0.0.0:$PORT \
     --bind-tcp=0.0.0.0:$PORT,auth=password,value=$XPRA_PASSWORD \
     --html=on \
     --start="/QuPath/bin/QuPath" \
