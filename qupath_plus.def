@@ -1,10 +1,6 @@
 Bootstrap: docker
 From: amd64/ubuntu:jammy
 
-%runscript
-    cd /QuPath/bin
-    ./QuPath
-
 %post
 # install needed dependencies
     rm -rf /var/lib/apt/lists/*
@@ -18,7 +14,23 @@ From: amd64/ubuntu:jammy
          unzip \
          curl
 
-# get latest version URL from latest release on GitHub
+# Install latest Xpra and dependencies
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
+    software-properties-common ca-certificates && \
+    wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://xpra.org/repos/jammy/xpra.sources
+
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    xpra \
+    xvfb \
+    xterm \
+    sshfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Install latest QuPath release from GitHub
     LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep location | awk -F/ '{print $NF'} | tr -d '\r')
     wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION}-Linux.tar.xz
     tar xvf QuPath-${LATEST_VERSION}-Linux.tar.xz
@@ -52,3 +64,22 @@ From: amd64/ubuntu:jammy
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.8.1.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.16.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
+
+%runscript
+#!/bin/bash
+    export DISPLAY=:100
+    PORT=$(shuf -n 1 -i 9000-12000)
+    KEY=$(uuidgen)
+    echo "Launching napari on Xpra. Connect via http://localhost:$PORT/?encryption=AES&keydata=$KEY \
+    or $(hostname -i):$PORT/?encryption=AES&keydata=$KEY"; \
+    xpra start \
+    --bind-tcp=0.0.0.0:$PORT,encryption=AES,keydata=$KEY \
+    --html=on \
+    --start="/QuPath/bin/QuPath" \
+    --exit-with-client="yes" \
+    --daemon=no \
+    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 "1920x1080x24+32" -nolisten tcp -noreset" \
+    --pulseaudio=no \
+    --notifications=no \
+    --bell=no \
+    $DISPLAY
