@@ -77,7 +77,7 @@ From: amd64/ubuntu:jammy
     http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"; \
     xpra start \
     --bind-tcp=0.0.0.0:$PORT \
-    --tcp-auth=password,value=XPRA_PASSWORD \
+    --tcp-auth=password,value=$XPRA_PASSWORD \
     --html=on \
     --start="/QuPath/bin/QuPath" \
     --exit-with-client="yes" \
