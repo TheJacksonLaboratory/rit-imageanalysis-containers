@@ -71,8 +71,9 @@ From: amd64/ubuntu:jammy
     export DISPLAY=:100
     PORT=$(shuf -n 1 -i 9000-12000)
     KEY=$(uuidgen)
+    echo "AES key is $KEY"
     echo "Launching napari on Xpra. Connect via http://localhost:$PORT/?encryption=AES&keydata=$KEY \
-    or $(hostname -i):$PORT/?encryption=AES&keydata=$KEY"; \
+    or http://$(hostname -i):$PORT/?encryption=AES&keydata=$KEY"; \
     xpra start \
     --bind-tcp=0.0.0.0:$PORT,encryption=AES,keydata=$KEY \
     --html=on \
