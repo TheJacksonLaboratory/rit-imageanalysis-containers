@@ -12,7 +12,7 @@ From: amd64/ubuntu:jammy
          xz-utils \
          openjfx \
          unzip \
-         curl
+         curl \
          uuid-runtime
 
 # Install latest Xpra and dependencies
