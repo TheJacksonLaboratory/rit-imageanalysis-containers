@@ -53,18 +53,26 @@ From: amd64/ubuntu:jammy
     wget https://github.com/qupath/qupath-extension-bioimageio/releases/download/v0.1.0/qupath-extension-bioimageio-0.1.0.jar
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-bioimageio-0.1.0.jar' QuPath.cfg
 
-    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.8.1/qupath-extension-biop-omero-0.8.1.zip
-    unzip qupath-extension-biop-omero-0.8.1.zip
-    rm qupath-extension-biop-omero-0.8.1.zip
-    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.10/OMERO.java-5.6.10-ice36.zip
-    unzip OMERO.java-5.6.10-ice36.zip
-    mv OMERO.java-5.6.10-ice36/libs .
-    rm OMERO.java-5.6.10-ice36.zip
-    rm -d OMERO.java-5.6.10-ice36
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v1.0.3/qupath-extension-biop-omero-1.0.3.zip
+    unzip qupath-extension-biop-omero-1.0.3.zip
+    rm qupath-extension-biop-omero-1.0.3.zip
+    
+    # need missing jar from 1.0.2
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v1.0.3/qupath-extension-biop-omero-1.0.2.zip
+    unzip qupath-extension-biop-omero-1.0.2.zip
+    # we don't need the 1.0.2 jar, just the simple-omero-client-5.18.0.jar
+    rm qupath-extension-biop-omero-1.0.2.jar
+    rm qupath-extension-biop-omero-1.0.2.zip
+    
+    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.13/OMERO.java-5.6.13-ice36.zip
+    unzip OMERO.java-5.6.13-ice36.zip
+    mv OMERO.java-5.6.13-ice36/libs .
+    rm OMERO.java-5.6.13-ice36.zip
+    rm -d OMERO.java-5.6.13-ice36
     
     # update classpaths so the omero extension uses the app path
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.8.1.jar' QuPath.cfg
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.16.0.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-1.0.3.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.18.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
 
 %runscript
@@ -73,8 +81,8 @@ From: amd64/ubuntu:jammy
     export XPRA_PASSWORD=$(uuidgen)
     echo "========================================="
     echo "Password is $XPRA_PASSWORD"
-    echo -e "Launching QuPath to display via Xpra. Connect via \n \
-    http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "Launching QuPath to display via Xpra. Connect via"
+    echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
     echo "========================================="
     xpra start \
     --bind-tcp=0.0.0.0:$PORT,auth=env \
