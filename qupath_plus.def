@@ -68,14 +68,16 @@ From: amd64/ubuntu:jammy
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
 
 %runscript
-    DISPLAY=:100
+    export DISPLAY=:100
     PORT=$(shuf -n 1 -i 9000-12000)
-    XPRA_PASSWORD=$(uuidgen)
+    export XPRA_PASSWORD=$(uuidgen)
+    echo "========================================="
     echo "Password is $XPRA_PASSWORD"
-    echo "Launching napari on Xpra. Connect via \
+    echo -e "Launching QuPath to display via Xpra. Connect via \n \
     http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "========================================="
     xpra start \
-    --bind-tcp=0.0.0.0:$PORT,auth=password,value=$XPRA_PASSWORD \
+    --bind-tcp=0.0.0.0:$PORT,auth=env \
     --html=on \
     --start="/QuPath/bin/QuPath" \
     --exit-with-client="yes" \
