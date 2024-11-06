@@ -58,7 +58,7 @@ From: amd64/ubuntu:jammy
     rm qupath-extension-biop-omero-1.0.3.zip
     
     # need missing jar from 1.0.2
-    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v1.0.3/qupath-extension-biop-omero-1.0.2.zip
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v1.0.2/qupath-extension-biop-omero-1.0.2.zip
     unzip qupath-extension-biop-omero-1.0.2.zip
     # we don't need the 1.0.2 jar, just the simple-omero-client-5.18.0.jar
     rm qupath-extension-biop-omero-1.0.2.jar
