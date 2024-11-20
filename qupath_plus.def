@@ -72,6 +72,8 @@ From: amd64/ubuntu:jammy
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-omero-0.4.0.jar' QuPath.cfg
 
 %runscript
+    #!/bin/bash
+    
     export DISPLAY=:$(shuf -n 1 -i 100-200)
     PORT=$(shuf -n 1 -i 9000-12000)
     export XPRA_PASSWORD=$(uuidgen)
