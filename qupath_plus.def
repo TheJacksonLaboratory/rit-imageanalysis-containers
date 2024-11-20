@@ -85,13 +85,14 @@ From: amd64/ubuntu:jammy
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
     echo "========================================="
     xpra start \
+    --minimal=yes \  # turn off most features
     --bind-tcp=0.0.0.0:$PORT,auth=env \
+    --websocket-upgrade=yes \
+    --opengl=yes \
     --html=on \
+    --compression-level=1 \
     --start="/QuPath/bin/QuPath" \
-    --exit-with-client="yes" \
     --daemon=no \
+    --clipboard=yes \
     --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
-    --pulseaudio=no \
-    --notifications=no \
-    --bell=no \
     $DISPLAY
