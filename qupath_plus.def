@@ -87,7 +87,8 @@ From: amd64/ubuntu:jammy
     --opengl=yes \
     --html=on \
     --compression-level=1 \
-    --start="/QuPath/bin/QuPath" \
+    --start-child="/QuPath/bin/QuPath" \
+    --exit-with-children=yes \
     --daemon=no \
     --clipboard=yes \
     --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
