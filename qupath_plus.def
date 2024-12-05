@@ -81,7 +81,7 @@ From: amd64/ubuntu:jammy
     echo "Password is $XPRA_PASSWORD"
     echo "Launching QuPath to display via Xpra on DISPLAY $DISPLAY. Connect via"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
-    echo "Logging errors to /tmp/xpra/xpra.log"
+    echo "Logging errors to /tmp/xpra.log"
     echo "========================================="
     xpra start \
     --minimal=yes \
