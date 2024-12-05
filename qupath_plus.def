@@ -96,4 +96,4 @@ From: amd64/ubuntu:jammy
     --clipboard=yes \
     --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
     $DISPLAY \
-    2>/tmp/xpra/xpra.log | tee --append /tmp/xpra/xpra.log
+    2>/tmp/xpra.log | tee --append /tmp/xpra.log
