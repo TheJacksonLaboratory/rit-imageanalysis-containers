@@ -8,6 +8,7 @@ From: amd64/ubuntu:jammy
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
+         netcat \
          libgl1 \
          xz-utils \
          openjfx \
@@ -75,7 +76,7 @@ From: amd64/ubuntu:jammy
     #!/bin/bash
     
     export DISPLAY=:$(shuf -n 1 -i 100-200)
-    PORT=$(shuf -n 1 -i 9000-12000)
+    while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
     export XPRA_PASSWORD=$(uuidgen)
     echo "========================================="
     echo "Password is $XPRA_PASSWORD"
