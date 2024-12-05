@@ -8,7 +8,7 @@ From: amd64/ubuntu:jammy
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
-         nc \
+         netcat \
          libgl1 \
          xz-utils \
          openjfx \
