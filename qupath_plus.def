@@ -1,10 +1,6 @@
 Bootstrap: docker
 From: amd64/ubuntu:jammy
 
-%runscript
-    cd /qupath/QuPath/bin
-    ./QuPath
-
 %post
 # install needed dependencies
     rm -rf /var/lib/apt/lists/*
@@ -12,43 +8,93 @@ From: amd64/ubuntu:jammy
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
+         netcat \
          libgl1 \
          xz-utils \
          openjfx \
-         unzip
-    
-# get QuPath 0.4.3
-    mkdir /qupath
-    chmod 777 qupath
-    cd /qupath
-    wget https://github.com/qupath/qupath/releases/download/v0.4.3/QuPath-0.4.3-Linux.tar.xz
-    tar -xvf QuPath-0.4.3-Linux.tar.xz
-    rm /qupath/QuPath-0.4.3-Linux.tar.xz
+         unzip \
+         curl \
+         xterm \
+         uuid-runtime
 
+# Install latest Xpra and dependencies
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
+    software-properties-common ca-certificates && \
+    wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/jammy/xpra.sources
+
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    xpra \
+    xvfb \
+    xterm \
+    sshfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Install latest QuPath release from GitHub
+    LATEST_VERSION=$(curl --silent -I https://github.com/qupath/qupath/releases/latest/ | grep location | awk -F/ '{print $NF'} | tr -d '\r')
+    wget https://github.com/qupath/qupath/releases/download/$LATEST_VERSION/QuPath-${LATEST_VERSION}-Linux.tar.xz
+    tar xvf QuPath-${LATEST_VERSION}-Linux.tar.xz
+    mv QuPath-${LATEST_VERSION}-Linux/QuPath .
+    rm QuPath-${LATEST_VERSION}-Linux.tar.xz
+    rm -r QuPath-${LATEST_VERSION}-Linux
 # set permissions to make it executable
-    chmod a+x /qupath/QuPath/bin/QuPath
+    chmod a+x QuPath/bin/QuPath
 
-# install extensions for 0.4.x
-    cd /qupath/QuPath/lib/app/
-    wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.2.0/qupath-extension-djl-0.2.0.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.2.0.jar' QuPath.cfg
+# install extensions for 0.5.x
+    cd QuPath/lib/app/
+    wget https://github.com/qupath/qupath-extension-djl/releases/download/v0.3.0/qupath-extension-djl-0.3.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-djl-0.3.0.jar' QuPath.cfg
 
-    wget https://github.com/qupath/qupath-extension-stardist/releases/download/v0.4.0/qupath-extension-stardist-0.4.0.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-stardist-0.4.0.jar' QuPath.cfg
+    wget https://github.com/qupath/qupath-extension-stardist/releases/download/v0.5.0/qupath-extension-stardist-0.5.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-stardist-0.5.0.jar' QuPath.cfg
 
     wget https://github.com/qupath/qupath-extension-bioimageio/releases/download/v0.1.0/qupath-extension-bioimageio-0.1.0.jar
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-bioimageio-0.1.0.jar' QuPath.cfg
 
-    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v0.5.0/qupath-extension-biop-omero-0.5.0.zip
-    unzip qupath-extension-biop-omero-0.5.0.zip
-    rm qupath-extension-biop-omero-0.5.0.zip
-    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.8/OMERO.java-5.6.8-ice36.zip
-    unzip OMERO.java-5.6.8-ice36.zip
-    mv OMERO.java-5.6.8-ice36/libs .
-    rm OMERO.java-5.6.8-ice36.zip
-    rm -d OMERO.java-5.6.8-ice36
-    # need to remove the extra (older) jar which causes conflicts
-    rm libs/slf4j-api.jar
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-0.5.0.jar' QuPath.cfg
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.14.0.jar' QuPath.cfg
+    wget https://github.com/BIOP/qupath-extension-biop-omero/releases/download/v1.0.3/qupath-extension-biop-omero-1.0.3.zip
+    unzip qupath-extension-biop-omero-1.0.3.zip
+    rm qupath-extension-biop-omero-1.0.3.zip
+    
+    wget https://github.com/ome/openmicroscopy/releases/download/v5.6.13/OMERO.java-5.6.13-ice36.zip
+    unzip OMERO.java-5.6.13-ice36.zip
+    mv OMERO.java-5.6.13-ice36/libs .
+    rm OMERO.java-5.6.13-ice36.zip
+    rm -d OMERO.java-5.6.13-ice36
+    
+    # update classpaths so the omero extension uses the app path
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-1.0.3.jar' QuPath.cfg
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.18.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
+
+    wget https://github.com/qupath/qupath-extension-omero-web/releases/download/v0.4.0/qupath-extension-omero-0.4.0.jar
+    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-omero-0.4.0.jar' QuPath.cfg
+
+%runscript
+    #!/bin/bash
+    
+    export DISPLAY=:$(shuf -n 1 -i 100-200)
+    while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
+    export XPRA_PASSWORD=$(uuidgen)
+    echo "========================================="
+    echo "Password is $XPRA_PASSWORD"
+    echo "Launching QuPath to display via Xpra on DISPLAY $DISPLAY. Connect via"
+    echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "Logging errors to /tmp/xpra.log"
+    echo "========================================="
+    xpra start \
+    --minimal=yes \
+    --bind-tcp=0.0.0.0:$PORT,auth=env \
+    --websocket-upgrade=yes \
+    --opengl=yes \
+    --html=on \
+    --compression-level=1 \
+    --start="/QuPath/bin/QuPath" \
+    --exit-with-windows=yes \
+    --daemon=no \
+    --clipboard=yes \
+    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    $DISPLAY \
+    2>/tmp/xpra.log | tee --append /tmp/xpra.log
