@@ -30,8 +30,8 @@ From: amd64/ubuntu:jammy
     export XPRA_PASSWORD=$(uuidgen)
     echo "========================================="
     echo "Password is $XPRA_PASSWORD"
-    echo "Launching Xpra with DISPLAY $DISPLAY."
-    echo "Run apps with prefix DISPLAY=$DISPLAY e.g."
+    echo "Launching Xpra with DISPLAY $DISPLAY and an xterm."
+    echo "Use the xterm to run apps or prefix DISPLAY=$DISPLAY e.g."
     echo "DISPLAY=$DISPLAY xterm" 
     echo "Connect to Xpra display via web browser at"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
