@@ -1,0 +1,68 @@
+Bootstrap:docker
+From:amd64/ubuntu:jammy
+
+%post
+    # install Fiji
+    export MYHOME=/home/user
+    mkdir $MYHOME
+    apt-get update
+    apt-get -y install wget unzip xvfb libxrender1 libxtst6 libxi6 fontconfig
+    apt-get clean
+    wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
+    unzip fiji-linux64.zip -d $MYHOME
+    rm fiji-linux64.zip
+    export PATH=$MYHOME/Fiji.app:$PATH 
+    echo "export PATH=$MYHOME/Fiji.app:$PATH" >> "$SINGULARITY_ENVIRONMENT"
+    cd $MYHOME
+    echo 'print("Hello World!");' > helloWorld.ijm
+    $MYHOME/Fiji.app/ImageJ-linux64 --update update
+
+    # Install latest Xpra and dependencies
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
+    software-properties-common ca-certificates netcat uuid-runtime && \
+    wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/jammy/xpra.sources
+
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    xpra \
+    xvfb \
+    xterm \
+    sshfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+%test
+    export MYHOME=/home/user
+    export PATH=$MYHOME/Fiji.app:$PATH
+    $MYHOME/Fiji.app/ImageJ-linux64 --headless -macro $MYHOME/helloWorld.ijm
+
+%runscript
+    #!/bin/bash
+    mkdir -p $HOME/.xpra
+    chmod 700 $HOME/.xpra
+    export XDG_RUNTIME_DIR=$HOME/.xpra
+    export DISPLAY=:$(shuf -n 1 -i 100-200)
+    while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
+    export XPRA_PASSWORD=$(uuidgen)
+    echo "========================================="
+    echo "Password is $XPRA_PASSWORD"
+    echo "Launching Fiji to display via Xpra on DISPLAY $DISPLAY. Connect via"
+    echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "Logging errors to /tmp/xpra.log"
+    echo "========================================="
+    xpra start \
+    --minimal=yes \
+    --bind-tcp=0.0.0.0:$PORT,auth=env \
+    --websocket-upgrade=yes \
+    --socket-dirs=$XDG_RUNTIME_DIR \
+    --opengl=yes \
+    --html=on \
+    --compression-level=1 \
+    --start="ImageJ-linux64" \
+    --exit-with-windows=yes \
+    --daemon=no \
+    --clipboard=yes \
+    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    $DISPLAY \
+    2>/tmp/xpra.log | tee --append /tmp/xpra.log
