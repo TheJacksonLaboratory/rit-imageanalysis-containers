@@ -59,7 +59,7 @@ From:amd64/ubuntu:jammy
     --opengl=yes \
     --html=on \
     --compression-level=1 \
-    --start="$MYHOME/Fiji.app/ImageJ-linux64" \
+    --start="ImageJ-linux64" \
     --exit-with-windows=yes \
     --daemon=no \
     --clipboard=yes \
