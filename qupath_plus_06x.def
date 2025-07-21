@@ -59,8 +59,6 @@ From: amd64/ubuntu:jammy
     rm -d OMERO.java-5.6.16-ice36
 
     # update classpaths so the omero extension uses the app path
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/qupath-extension-biop-omero-1.0.3.jar' QuPath.cfg
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/simple-omero-client-5.18.0.jar' QuPath.cfg
     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/libs/*' QuPath.cfg
 
     wget https://github.com/qupath/qupath-extension-omero/releases/download/v0.1.0/qupath-extension-omero-0.1.0.jar
