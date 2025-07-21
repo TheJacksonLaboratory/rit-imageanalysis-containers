@@ -34,11 +34,11 @@ From: amd64/ubuntu:jammy
 
 
 # Install 051 QuPath release from GitHub
-    wget https://github.com/qupath/qupath/releases/download/v0.5.1/QuPath-0.5.1-Linux.tar.xz
-    tar xvf QuPath-0.5.1-Linux.tar.xz
-    mv QuPath-0.5.1-Linux/QuPath .
-    rm QuPath-0.5.1-Linux.tar.xz
-    rm -r QuPath-0.5.1-Linux
+    wget https://github.com/qupath/qupath/releases/download/v0.5.1/QuPath-v0.5.1-Linux.tar.xz
+    tar xvf QuPath-v0.5.1-Linux.tar.xz
+    mv QuPath-v0.5.1-Linux/QuPath .
+    rm QuPath-v0.5.1-Linux.tar.xz
+    rm -r QuPath-v0.5.1-Linux
 # set permissions to make it executable
     chmod a+x QuPath/bin/QuPath
 
