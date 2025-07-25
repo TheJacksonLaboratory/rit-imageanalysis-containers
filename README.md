@@ -2,7 +2,7 @@
 
 This is a repository with Singularity (also known as Apptainer) definitions that build containers with a number of different image analysis tools and a set of scripts that take care of running a SLURM task that spins up one of those containers. These have been tested on our cluster (Sumner2) - we cannot guarantee the SLURM part of it will work with your cluster but the containers should work on any Linux system!
 
-## Guide to the containers
+## Guide to the container definitions
 
 #### QuPath
 * `qupath_plus_051.def`: QuPath v0.5.1 with additional extensions pre-installed (OMERO, StarDist) and including [Xpra](https://xpra.org/) for remote GUI access via browser.
