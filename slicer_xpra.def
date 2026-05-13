@@ -1,0 +1,64 @@
+Bootstrap: docker
+From: amd64/ubuntu:jammy
+
+%post
+# install needed Slicer dependencies
+    rm -rf /var/lib/apt/lists/*
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    libglu1-mesa libpulse-mainloop-glib0 libnss3 libasound2 qt5dxcb-plugin libsm6
+
+# Install latest Xpra and dependencies
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
+    netcat uuid-runtime software-properties-common ca-certificates && \
+    wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/jammy/xpra.sources
+
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    xpra \
+    xvfb \
+    xterm \
+    sshfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download Slicer 5.8.1 release
+    wget https://slicer-packages.kitware.com/api/v1/item/67c51fc129825655577cfee9/download
+    tar xvf download
+    rm download
+# set permissions to make it executable
+    chmod a+x Slicer-5.8.1-linux-amd64/Slicer
+
+%runscript
+    #!/bin/bash
+    # setup secure DISPLAY
+    export DISPLAY=:$(shuf -n 1 -i 100-200)
+    export XAUTHORITY="${HOME}/.Xauthority"
+    xauth add ${DISPLAY} . "$(mcookie)"
+    mkdir -p $HOME/.xpra
+    chmod 700 $HOME/.xpra
+    export XDG_RUNTIME_DIR=$HOME/.xpra
+    while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
+    export XPRA_PASSWORD=$(uuidgen)
+    echo "========================================="
+    echo "Password is $XPRA_PASSWORD"
+    echo "Launching Slicer to display via Xpra on DISPLAY $DISPLAY. Connect via"
+    echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "Logging errors to /tmp/xpra.log"
+    echo "========================================="
+    xpra start \
+    --minimal=yes \
+    --bind-tcp=0.0.0.0:$PORT,auth=env \
+    --websocket-upgrade=yes \
+    --socket-dirs=$XDG_RUNTIME_DIR \
+    --opengl=yes \
+    --html=on \
+    --compression-level=1 \
+    --start="/Slicer-5.8.1-linux-amd64/Slicer" \
+    --exit-with-windows=yes \
+    --daemon=no \
+    --clipboard=yes \
+    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    $DISPLAY \
+    2>/tmp/xpra.log | tee --append /tmp/xpra.log
