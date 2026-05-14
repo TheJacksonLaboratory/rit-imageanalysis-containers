@@ -46,6 +46,7 @@ From: amd64/ubuntu:jammy
     echo "Password is $XPRA_PASSWORD"
     echo "Launching Slicer to display via Xpra on DISPLAY $DISPLAY. Connect via"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
+    echo "Please be patient; there will be no splash screen."
     echo "Logging errors to /tmp/xpra.log"
     echo "========================================="
     xpra start \
