@@ -35,21 +35,20 @@ From: amd64/ubuntu:jammy
     #!/bin/bash
     # setup secure DISPLAY
     export DISPLAY=:$(shuf -n 1 -i 100-200)
-    export XAUTHORITY="${HOME}/.Xauthority"
-    xauth add ${DISPLAY} . "$(mcookie)"
     mkdir -p $HOME/.xpra
     chmod 700 $HOME/.xpra
     export XDG_RUNTIME_DIR=$HOME/.xpra
-    export XPRA_INITIAL_RESOLUTION="${XPRA_INITIAL_RESOLUTION:-1920x1080}"
+    export XPRA_PRIVATE_XAUTH=1
+    export XPRA_LOG="$XDG_RUNTIME_DIR/xpra-slicer.log"
     while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
     export XPRA_PASSWORD=$(uuidgen)
     echo "========================================="
     echo "Password is $XPRA_PASSWORD"
     echo "Launching Slicer to display via Xpra on DISPLAY $DISPLAY. Connect via"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
-    echo "Initial Xpra display size is $XPRA_INITIAL_RESOLUTION and it will resize to the client."
+    echo "Slicer will start after the first client connects so the display can size to the browser."
     echo "Please be patient; there will be no splash screen."
-    echo "Logging errors to /tmp/xpra.log"
+    echo "Logging errors to $XPRA_LOG"
     echo "========================================="
     xpra start \
     --minimal=yes \
@@ -58,12 +57,16 @@ From: amd64/ubuntu:jammy
     --socket-dirs=$XDG_RUNTIME_DIR \
     --opengl=yes \
     --html=on \
-    --resize-display=$XPRA_INITIAL_RESOLUTION \
+    --resize-display=yes \
     --compression-level=1 \
-    --start="/Slicer-5.8.1-linux-amd64/Slicer --no-splash" \
+    --pings=5 \
+    --encodings=rgb,png,jpeg,webp \
+    --mousewheel=on \
+    --cursors=yes \
+    --start-child-after-connect="/Slicer-5.8.1-linux-amd64/Slicer --no-splash" \
     --exit-with-windows=yes \
     --daemon=no \
     --clipboard=yes \
-    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 ${XPRA_INITIAL_RESOLUTION}x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    --xvfb="Xvfb" \
     $DISPLAY \
-    2>/tmp/xpra.log | tee --append /tmp/xpra.log
+    2>"$XPRA_LOG" | tee --append "$XPRA_LOG"
