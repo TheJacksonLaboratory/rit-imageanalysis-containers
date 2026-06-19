@@ -57,22 +57,23 @@ From:amd64/ubuntu:jammy
     echo "Logging errors to $XPRA_LOG"
     echo "========================================="
     xpra start \
-    --minimal=yes \
     --bind-tcp=0.0.0.0:$PORT,auth=env \
-    --websocket-upgrade=yes \
+    --mdns=no \
     --socket-dirs=$XDG_RUNTIME_DIR \
-    --opengl=yes \
     --html=on \
     --resize-display=yes \
-    --compression-level=1 \
-    --pings=5 \
-    --encodings=rgb,png,jpeg,webp \
-    --mousewheel=on \
-    --cursors=yes \
+    --dpi=96 \
+    --file-transfer=no \
+    --open-files=no \
+    --open-url=no \
+    --printing=no \
+    --webcam=no \
+    --notifications=no \
+    --system-tray=no \
+    --audio=no \
     --start-child-after-connect="fiji" \
     --exit-with-windows=yes \
     --daemon=no \
-    --clipboard=yes \
     --xvfb="Xvfb" \
     $DISPLAY \
     2>"$XPRA_LOG" | tee --append "$XPRA_LOG"
