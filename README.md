@@ -65,6 +65,8 @@ To run a container you need to have the module loaded on a compute node. You can
 ```bash
 ./qupath_0_6_0.sif
 ```
+For the Xpra-enabled containers, `xpra` now manages the virtual X server directly instead of hard-coding a `1920x1080` framebuffer. The application starts after the first browser client connects, so the virtual display can size to the browser without forcing lower-resolution users to start on a giant display.
+
 We also provide a convenience script to start a batch job with your container: `./spin_container.sh`. 
 As long as your built container is in the same directory, you're good to go. By default, it will run as a job on a 
 single core, with 4GB RAM for 10 minutes.
@@ -75,4 +77,3 @@ We have two scripts: `open_container.sh` and `spin_container.sh`. You shouldn't 
 -c  How many cores your job will use (default: 1)
 -m  How much memory will be allocated for your job (default: 4GB)
 ```
-

@@ -76,6 +76,8 @@ From: amd64/ubuntu:jammy
     mkdir -p $HOME/.xpra
     chmod 700 $HOME/.xpra
     export XDG_RUNTIME_DIR=$HOME/.xpra
+    export XPRA_PRIVATE_XAUTH=1
+    export XPRA_LOG="$XDG_RUNTIME_DIR/xpra-qupath-plus.log"
     export DISPLAY=:$(shuf -n 1 -i 100-200)
     while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
     export XPRA_PASSWORD=$(uuidgen)
@@ -83,20 +85,27 @@ From: amd64/ubuntu:jammy
     echo "Password is $XPRA_PASSWORD"
     echo "Launching QuPath to display via Xpra on DISPLAY $DISPLAY. Connect via"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
-    echo "Logging errors to /tmp/xpra.log"
+    echo "QuPath will start after the first client connects so the display can size to the browser."
+    echo "Logging errors to $XPRA_LOG"
     echo "========================================="
     xpra start \
-    --minimal=yes \
     --bind-tcp=0.0.0.0:$PORT,auth=env \
-    --websocket-upgrade=yes \
+    --mdns=no \
     --socket-dirs=$XDG_RUNTIME_DIR \
-    --opengl=yes \
     --html=on \
-    --compression-level=1 \
-    --start="/QuPath/bin/QuPath" \
+    --resize-display=yes \
+    --dpi=96 \
+    --file-transfer=no \
+    --open-files=no \
+    --open-url=no \
+    --printing=no \
+    --webcam=no \
+    --notifications=no \
+    --system-tray=no \
+    --audio=no \
+    --start-child-after-connect="/QuPath/bin/QuPath" \
     --exit-with-windows=yes \
     --daemon=no \
-    --clipboard=yes \
-    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    --xvfb="Xvfb" \
     $DISPLAY \
-    2>/tmp/xpra.log | tee --append /tmp/xpra.log
+    2>"$XPRA_LOG" | tee --append "$XPRA_LOG"
