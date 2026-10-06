@@ -1,14 +1,15 @@
 Bootstrap: docker
-From: amd64/ubuntu:jammy
+From: amd64/ubuntu:noble
 
-# Based on the official CellProfiler Dockerfile, updated to jammy:
+# Based on the official CellProfiler Dockerfile, updated to noble:
 # https://github.com/CellProfiler/distribution/blob/master/docker/Dockerfile
 
 %environment
     export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    export GTK_THEME=CPCompact
 
 %post
-# install CellProfiler build dependencies; python 3.9 is not in jammy, so use deadsnakes
+# install CellProfiler build dependencies; python 3.9 is not in noble, so use deadsnakes
     rm -rf /var/lib/apt/lists/*
     apt-get update -y
     DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
@@ -17,7 +18,7 @@ From: amd64/ubuntu:jammy
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
          make gcc build-essential libgtk-3-dev wget git \
          python3.9-dev python3.9-venv openjdk-11-jdk-headless default-libmysqlclient-dev \
-         libnotify-dev libsdl2-dev libwebkit2gtk-4.0-dev
+         libnotify-dev libsdl2-dev libwebkit2gtk-4.1-dev
 
 # Install CellProfiler 4.2.8 into a venv; the symlink keeps the venv python off PATH
 # so it does not shadow the system python3 that xpra uses
@@ -25,7 +26,7 @@ From: amd64/ubuntu:jammy
     python3.9 -m venv /opt/venv
     /opt/venv/bin/pip install --upgrade pip
     /opt/venv/bin/pip install wheel cython "numpy<1.25"
-    /opt/venv/bin/pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.1-cp39-cp39-linux_x86_64.whl
+    /opt/venv/bin/pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxPython-4.2.2-cp39-cp39-linux_x86_64.whl
     # python-javabridge is sdist-only and needs the numpy/cython installed above at build time
     /opt/venv/bin/pip install --no-build-isolation cellprofiler==4.2.8
     /opt/venv/bin/pip cache purge
@@ -33,9 +34,9 @@ From: amd64/ubuntu:jammy
 
 # Install latest Xpra and dependencies
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg2 apt-transport-https \
-    netcat uuid-runtime software-properties-common ca-certificates && \
+    netcat-openbsd uuid-runtime software-properties-common ca-certificates && \
     wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
-    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/jammy/xpra.sources
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/noble/xpra.sources
 
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
@@ -46,6 +47,17 @@ From: amd64/ubuntu:jammy
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Compact GTK3 theme: Adwaita's button padding is wider than CellProfiler's small
+# fixed-size wx buttons (+, -, ?), which squeezes their labels out and leaves them blank
+# Assisted-by: Claude
+    mkdir -p /usr/share/themes/CPCompact/gtk-3.0
+    cat > /usr/share/themes/CPCompact/gtk-3.0/gtk.css <<'CSS_EOF'
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk.css");
+button, button.text-button, button.image-button, button.text-button.image-button {
+    padding: 0 2px; min-width: 0; min-height: 0;
+}
+CSS_EOF
+
 %test
     /opt/venv/bin/python -c "import wx, bioformats, cellprofiler_core; print('wx', wx.version())"
     /opt/venv/bin/pip show cellprofiler
@@ -54,31 +66,38 @@ From: amd64/ubuntu:jammy
     #!/bin/bash
     # setup secure DISPLAY
     export DISPLAY=:$(shuf -n 1 -i 100-200)
-    export XAUTHORITY="${HOME}/.Xauthority"
-    xauth add ${DISPLAY} . "$(mcookie)"
     mkdir -p $HOME/.xpra
     chmod 700 $HOME/.xpra
     export XDG_RUNTIME_DIR=$HOME/.xpra
+    export XPRA_PRIVATE_XAUTH=1
+    export XPRA_LOG="$XDG_RUNTIME_DIR/xpra-cellprofiler.log"
     while PORT=$(shuf -n 1 -i 49152-65535); nc -z 0.0.0.0 $PORT; do continue; done
     export XPRA_PASSWORD=$(uuidgen)
     echo "========================================="
     echo "Password is $XPRA_PASSWORD"
     echo "Launching CellProfiler to display via Xpra on DISPLAY $DISPLAY. Connect via"
     echo "http://$(hostname -i):$PORT/?password=$XPRA_PASSWORD"
-    echo "Logging errors to /tmp/xpra.log"
+    echo "CellProfiler will start after the first client connects so the display can size to the browser."
+    echo "Logging errors to $XPRA_LOG"
     echo "========================================="
     xpra start \
-    --minimal=yes \
     --bind-tcp=0.0.0.0:$PORT,auth=env \
-    --websocket-upgrade=yes \
+    --mdns=no \
     --socket-dirs=$XDG_RUNTIME_DIR \
-    --opengl=yes \
     --html=on \
-    --compression-level=1 \
-    --start="cellprofiler" \
+    --resize-display=yes \
+    --dpi=96 \
+    --file-transfer=no \
+    --open-files=no \
+    --open-url=no \
+    --printing=no \
+    --webcam=no \
+    --notifications=no \
+    --system-tray=no \
+    --audio=no \
+    --start-child-after-connect="cellprofiler" \
     --exit-with-windows=yes \
     --daemon=no \
-    --clipboard=yes \
-    --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset -auth $XAUTHORITY" \
+    --xvfb="Xvfb" \
     $DISPLAY \
-    2>/tmp/xpra.log | tee --append /tmp/xpra.log
+    2>"$XPRA_LOG" | tee --append "$XPRA_LOG"
