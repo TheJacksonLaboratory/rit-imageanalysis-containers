@@ -16,6 +16,8 @@ This is a repository with Singularity (also known as Apptainer) definitions that
 
 We recommend using the official released [CellProfiler container from docker-hub](https://hub.docker.com/r/cellprofiler/cellprofiler). Here we provide definitions for CellProfiler v4.2.6, with either StarDist or Cellpose pre-installed, best suited for headless use.
 
+* `cellprofiler_xpra.def`: CellProfiler v4.2.8, built following the [official CellProfiler Dockerfile](https://github.com/CellProfiler/distribution/blob/master/docker/Dockerfile) but on Ubuntu 22.04, with [Xpra](https://xpra.org/) for remote GUI access via browser.
+
 #### Other containers
 
 * If you are looking for a JupyterLab container, we recommend choosing [one of the official Jupyter containers](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html). 
